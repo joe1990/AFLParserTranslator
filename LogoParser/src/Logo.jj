@@ -48,7 +48,7 @@ public class Logo {
 PARSER_END(Logo)
 
 // skip separators
-SKIP : { <" " | "\t" | "\n" | "\r"> }
+SKIP : { <" " | "\t" | "\n" | "\r" | < COMMENT >> }
 
 // Constants, pre-defined, operators etc.
 TOKEN: { <ADD: "+">   | <SUB: "-">  | <MUL: "*"> | <DIV: "/"> }
@@ -80,9 +80,15 @@ TOKEN: { <#DIGIT:  ["0"-"9"]> }
 TOKEN: { <#LETTER: ["A"-"Z"]> }
 TOKEN: { <NUM: (<DIGIT>)+ | (<DIGIT>)+ "." (<DIGIT>)+ > }
 TOKEN: { <IDENTIFIER: <LETTER> ( <LETTER> | <DIGIT> )* > }
-TOKEN: { <PARAMETER: <PARSEP> <IDENTIFIER> > // removes parameter separator
+TOKEN: { <PARAMETER: <PARSEP> <IDENTIFIER> > // removes parameter separator}
+
+
+TOKEN: { <#HASH: "#" > }
+TOKEN: { < COMMENT: (< HASH > (~["\n","\r"])* ("\n" | "\r" | "\r\n")) >}
+
+
 //          { matchedToken.image=image.substring(1,image.length()); }
-}
+
 
 void start() throws IOException:
 { Token t; }
@@ -90,10 +96,10 @@ void start() throws IOException:
   // logo programs start with LOGO followed by an identifier
   <LOGO> t = <IDENTIFIER>
   // Creation of the output files
-//   {
+   {
 //     // Create the HTML file for the applet
-//     htmlFile = new File(t.image.toLowerCase() + ".html");
-//     pw = new PrintWriter(new FileOutputStream(htmlFile));
+     htmlFile = new File(t.image.toLowerCase() + ".html");
+     pw = new PrintWriter(new FileOutputStream(htmlFile));
 //     pw.println("<html>");
 //     pw.println("  <body>");
 //     pw.println("  <applet code='" + t.image.toLowerCase() +
@@ -111,8 +117,8 @@ void start() throws IOException:
 //     indent();
 //     pw.println("private LogoPrimitives logo;\n");
 //     pw.flush();
-//   }
-//  ( subroutine() )*
+   }
+  ( subroutine() )*
 //  // Open the necessary method "paint" of the applet
 //   {
 //     indent(); numIndent++;
@@ -121,7 +127,7 @@ void start() throws IOException:
 //     pw.println("logo = new LogoPrimitives(this);");
 //     pw.println();
 //   }
-//  ( statement() )*
+  ( statement() )*
   // close the method "paint"
 //   {
 //     numIndent--;
@@ -139,7 +145,9 @@ void start() throws IOException:
 void subroutine():
 {  	Token t;
 }{
-	//TODO  	  }
+	< SUBROUTINE > t = < IDENTIFIER >
+	( < PARAMETER > )*	( statement() )*
+	< END >}
 
 void statement():
 {
@@ -176,7 +184,7 @@ void nterm():
 	Token t;
 }
 {
-  	nfactor ((< MUL > | < DIV >) nfactor())*
+  	nfactor() ((< MUL > | < DIV >) nfactor())*
 }
 
 void nfactor():
@@ -207,7 +215,7 @@ void bfactor():
 }
 {
 	< TRUE > | < FALSE > | < NOT > < LPAR > bexpr() < RPAR >
-	| nexpr() (< EQ > | < NE > | < LT > | < GT > | < LE > | < GE > | nexpr()
+	| nexpr() (< EQ > | < NE > | < LT > | < GT > | < LE > | < GE > ) nexpr()
 }  
 
 // TODO: Edit the rules (add translator) and add more rules

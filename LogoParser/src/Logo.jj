@@ -148,119 +148,260 @@ void start() throws IOException:
 
 void subroutine():
 {  	Token t;
+  	String printString = "";
+  	String parameter = "";
+  	String statement = "";
 }{
+  (
 	< SUBROUTINE > t = < IDENTIFIER >
 	{
-	  pw.println("private void " + t.image.toLowerCase() + "(";
+	  printString = "private void " + t.image.toLowerCase() + "(";
 	}
 	(
 	  < PARAMETER >
 	  {
-		//String parameter = t.image.substring(1, t.image.length()).toLowerCase();
-		//pw.println("double " + parameter + ", ";);
+		parameter = t.image.substring(1, t.image.length()).toLowerCase();
+		printString += "double " + parameter + ",";	
 	  }
 	)*
-	{		
-	}	( statement() )*
 	{
-	  	}
-	< END >}
+	  	//Remove last "," 		printString = printString.substring(0, printString.length() - 1) + ") {\n";		
+	}	(
+	  statement = statement()
+	  {
+	    printString += statement;	  }  
+	)*
+	{		printString += "} \n";	}
+	< END >
+	{
+	  pw.println(printString);
+	  pw.flush();	}
+  )}
 
-void statement():
+String statement():
 {
 	Token t;
+	String rValue = "";
+	String nexpr;
+	String bexpr;
+	String statement;
 }
 {
-	  t = < CLEARSCREEN >	  {
-	    pw.println("logo.cs();\n");
-	    pw.flush();	  }
+  (
+	  < CLEARSCREEN >	  {
+	    rValue = "logo.cs();\n";	  }
 	  | < PENDOWN >
 	  {
-	    pw.println("logo.pd();\n");
-	    pw.flush();
+	    rValue = "logo.pd();\n";
 	  }
 	  | < PENUP >
 	  {
-	    pw.println("logo.pu();\n");
-	    pw.flush();
+	    rValue = "logo.pu();\n";
 	  }
 	  | < HIDETURTLE >
 	  {
-	    pw.println("logo.ht();\n");
-	    pw.flush();
+	    rValue = "logo.ht();\n";
 	  }
 	  | < SHOWTURTLE >
 	  {
-	    pw.println("logo.st();\n");
-	    pw.flush();
+	   rValue = "logo.st();\n";
 	  }
-	  | < FORWARD > nexpr()
+	  |
+	  	< FORWARD >
+	  	nexpr = nexpr()
 	  {
-	    
+	    rValue = "logo.fd(" + nexpr + ");\n";
 	  }
-	  | < BACKWARD > nexpr()
+	  |
+	  	< BACKWARD >
+	  	nexpr = nexpr()
+	  {		rValue = "logo.bk(" + nexpr + ");\n";
+	  }
+	  |
+	  	< LEFTTURN >
+	  	nexpr = nexpr()
+	  {		rValue = "logo.lt(" + nexpr + ");\n";
+	  }
+	  |
+	  	< RIGHTTURN >
+	  	nexpr = nexpr()
+	  {		rValue = "logo.rt(" + nexpr + ");\n";
+	  }
+	  |
+	  	< WAIT >
+	  	nexpr = nexpr()
+	  {		rValue = "logo.wait(" + nexpr + ");\n";
+	  }
+	  |
+	  	< REPEAT >
+	  	nexpr = nexpr()
+	  	{
+	  	  rValue = "for(int i = 1; i <= " + nexpr + "; i++){\n";
+	  	}
+	  	< LBRA >
+	  	(
+	  	  statement = statement()
+	  	  {
+	  	    rValue += statement;	  	  }
+	  	)*
+	  	< RBRA >
+	  	{
+	  	  rValue = rValue + "}\n";	  	}
+	  |
+	  	< IF >
+	  	bexpr = bexpr()
+	  	{
+	  	  rValue = "if ("+ bexpr + )"{\n";	  	}
+	  	< LBRA >
+	  	(
+	  	  statement = statement()
+	  	  {
+	  	    rValue += statement;	  	  }
+	  	)*
+	  	< RBRA >
+	  	{
+	  	  rValue += "}\n";	  		  	}
+	  |
+	  	< IFELSE >
+	  	bexpr = bexpr()
+		{
+		  rValue = "if ("+ bexpr + )"{\n";		}
+	  	< LBRA >
+	  	(
+	  	  statement = statement()
+	  	  {
+	  	    rValue += statement;	  	  }
+	  	)*
+	  	< RBRA >
+	  	{
+	  	  rValue += "} else {\n";	  	}
+	  	< LBRA > (
+	  	  statement = statement()
+	  	  {
+	  	    rValue += statement;	  	  }
+	  	)*
+	  	< RBRA >
+	  	{
+	  	  rValue += "}\n";	  	}
+	  |
+	  t = < IDENTIFIER >
 	  {
-	  }
-	  | < LEFTTURN > nexpr()
+	    rValue = t.image.toLowerCase() + "(";	  }
+	  (
+	    nexpr = nexpr()
+	    {
+	      rValue += nexpr + ",";	    }
+	  )*
 	  {
-	  }
-	  | < RIGHTTURN > nexpr()
-	  {
-	  }
-	  | < WAIT > nexpr()
-	  {
-	  }
-	  | < REPEAT > nexpr() < LBRA > (statement())* < RBRA >
-	  | < IF > bexpr() < LBRA > (statement())* < RBRA >
-	  | < IFELSE > bexpr() < LBRA > (statement())* < RBRA > < LBRA > (statement())* < RBRA >
-	  | < IDENTIFIER > (nexpr())*
+	    //Remove last "," 
+	    rValue = rValue.substring(0, rValue.length() - 1) + ");\n";	  }
+	)
+	{
+	  return rValue;	}	
 }
 
-void nexpr():
+String nexpr():
+{
+	Token t;
+	String rValue = "";
+	String nterm;
+}
+{
+  (
+    rValue = nterm()
+	(
+	  < ADD >
+	  nterm = nterm()	  {
+	    rValue += " + " + nterm; 	  }
+	  |
+	  < SUB >
+	  nterm = nterm()
+	  {
+	    rValue += " - " + nterm;	  } 
+	)*  )
+  {
+    return rValue;  }
+}
+
+String nterm():
+{
+	Token t;
+	String rValue = "";
+	String nfactor;
+}
+{
+  (
+	rValue = nfactor();
+    (      
+      < MUL >
+      nfactor = nfactor()
+      {
+        rValue += " * " + nfactor;       }
+      |
+      < DIV >
+      nfactor = nfactor()
+      {
+        rValue += " / " + nfactor;      } 
+  	)*
+  )
+  {
+    return rValue;  }
+}
+
+String nfactor():
 {
 	Token t;
 }
-{	nterm() ((< ADD > | < SUB >) nterm())*
-}
-
-void nterm():
 {
-	Token t;
-}
-{
-  	nfactor() ((< MUL > | < DIV >) nfactor())*
-}
-
-void nfactor():
-{
-	Token t;
-}
-{
+  //TODO
 	< SUB > (< NUM > | < REPCOUNT > | < PARAMETER > | < LPAR > nexpr() < RPAR >) |
 	< NUM > | < REPCOUNT > | < PARAMETER > | < LPAR > nexpr() < RPAR >
 }
 
-void bexpr():
+String bexpr():
 {	Token t;
-}{	bterm() (< OR > bterm())*
+	String rValue = "";
+	String bterm;
+}{
+  (
+    rValue = bterm()
+	(
+	  < OR >
+	  bterm = bterm()
+	  {
+	    rValue += " || " + bterm; 	  }
+	)*
+  )
+  {
+    return rValue;
+  }
 }
 
-void bterm():
+String bterm():
+{
+	Token t;
+	String rValue = "";
+	String bfactor;
+}
+{
+  (
+    rValue = bfactor()
+    (
+      < AND >
+      bfactor = bfactor()
+      {
+        rValue += " && " + bfactor;      }    )*  )
+  {
+    return rValue;  }
+}
+
+String bfactor():
 {
 	Token t;
 }
 {
-	bfactor() (< AND > bfactor())*
-}
-
-void bfactor():
-{
-	Token t;
-}
-{
+  //TODO
 	< TRUE > | < FALSE > | < NOT > < LPAR > bexpr() < RPAR >
 	| nexpr() (< EQ > | < NE > | < LT > | < GT > | < LE > | < GE > ) nexpr()
 }
-
-// TODO: Edit the rules (add translator) and add more rules
 

@@ -97,56 +97,73 @@ void start() throws IOException:
   <LOGO> t = <IDENTIFIER>
   // Creation of the output files
    {
-//     // Create the HTML file for the applet
+     // Create the HTML file for the applet
      htmlFile = new File(t.image.toLowerCase() + ".html");
      pw = new PrintWriter(new FileOutputStream(htmlFile));
-//     pw.println("<html>");
-//     pw.println("  <body>");
-//     pw.println("  <applet code='" + t.image.toLowerCase() +
-//                ".class'width=600 height=600></applet>");
-//     pw.println("  </html>");
-//     pw.println("</body>");
-//     pw.close();
-//     //Create the Java file and the class
-//     javaFile = new File(t.image.toLowerCase() + ".java");
-//     pw = new PrintWriter(new FileOutputStream(javaFile));
-//     pw.println("import java.awt.Graphics;\n");
-//     pw.println("public class " + t.image.toLowerCase() +
-//                " extends java.applet.Applet {\n" );
-//     numIndent++;
-//     indent();
-//     pw.println("private LogoPrimitives logo;\n");
-//     pw.flush();
+     pw.println("<html>");
+     pw.println("  <body>");
+     pw.println("  <applet code='" + t.image.toLowerCase() +
+                ".class'width=600 height=600></applet>");
+     pw.println("  </html>");
+     pw.println("</body>");
+     pw.close();
+     
+     //Create the Java file and the class
+     javaFile = new File(t.image.toLowerCase() + ".java");
+     pw = new PrintWriter(new FileOutputStream(javaFile));
+     pw.println("import java.awt.Graphics;\n");
+     pw.println("public class " + t.image.toLowerCase() +
+                " extends java.applet.Applet {\n" );
+     numIndent++;
+     indent();
+     pw.println("private LogoPrimitives logo;\n");
+     pw.flush();
    }
   ( subroutine() )*
-//  // Open the necessary method "paint" of the applet
-//   {
-//     indent(); numIndent++;
-//     pw.println("public void paint(Graphics g) {");
-//     indent();
-//     pw.println("logo = new LogoPrimitives(this);");
-//     pw.println();
-//   }
+	// Open the necessary method "paint" of the applet
+   	{
+		indent();
+		numIndent++;
+    	pw.println("public void paint(Graphics g) {");
+		indent();
+		pw.println("logo = new LogoPrimitives(this);");
+		pw.println();
+   	}
   ( statement() )*
-  // close the method "paint"
-//   {
-//     numIndent--;
-//     indent();
-//     pw.println("}");
-//   }
+  	// close the method "paint"
+	{
+     	numIndent--;
+  		indent();
+		pw.println("}");
+	}
   // close the class
   <END>
-//   { numIndent--; indent();
-//     pw.println("}");
-//     pw.flush(); pw.close(); }
-//   }
+  {
+  	numIndent--;
+  	indent();
+	pw.println("}");
+    pw.flush(); pw.close(); }
+  }
 }
 
 void subroutine():
 {  	Token t;
 }{
 	< SUBROUTINE > t = < IDENTIFIER >
-	( < PARAMETER > )*	( statement() )*
+	{
+	  pw.println("private void " + t.image.toLowerCase() + "(";
+	}
+	(
+	  < PARAMETER >
+	  {
+		//String parameter = t.image.substring(1, t.image.length()).toLowerCase();
+		//pw.println("double " + parameter + ", ";);
+	  }
+	)*
+	{		
+	}	( statement() )*
+	{
+	  	}
 	< END >}
 
 void statement():
@@ -155,17 +172,44 @@ void statement():
 }
 {
 	  t = < CLEARSCREEN >	  {
-	    pw.println("logo." + t.image.toLowerCase() + "()\n");
+	    pw.println("logo.cs();\n");
 	    pw.flush();	  }
-	  | < PENDOWN > 
+	  | < PENDOWN >
+	  {
+	    pw.println("logo.pd();\n");
+	    pw.flush();
+	  }
 	  | < PENUP >
+	  {
+	    pw.println("logo.pu();\n");
+	    pw.flush();
+	  }
 	  | < HIDETURTLE >
+	  {
+	    pw.println("logo.ht();\n");
+	    pw.flush();
+	  }
 	  | < SHOWTURTLE >
+	  {
+	    pw.println("logo.st();\n");
+	    pw.flush();
+	  }
 	  | < FORWARD > nexpr()
+	  {
+	    
+	  }
 	  | < BACKWARD > nexpr()
+	  {
+	  }
 	  | < LEFTTURN > nexpr()
+	  {
+	  }
 	  | < RIGHTTURN > nexpr()
-	  | < WAIT > nexpr() 
+	  {
+	  }
+	  | < WAIT > nexpr()
+	  {
+	  }
 	  | < REPEAT > nexpr() < LBRA > (statement())* < RBRA >
 	  | < IF > bexpr() < LBRA > (statement())* < RBRA >
 	  | < IFELSE > bexpr() < LBRA > (statement())* < RBRA > < LBRA > (statement())* < RBRA >
@@ -216,7 +260,7 @@ void bfactor():
 {
 	< TRUE > | < FALSE > | < NOT > < LPAR > bexpr() < RPAR >
 	| nexpr() (< EQ > | < NE > | < LT > | < GT > | < LE > | < GE > ) nexpr()
-}  
+}
 
 // TODO: Edit the rules (add translator) and add more rules
 

@@ -142,7 +142,7 @@ void start() throws IOException:
   	numIndent--;
   	indent();
 	pw.println("}");
-    pw.flush(); pw.close(); }
+    pw.flush(); pw.close();
   }
 }
 
@@ -165,7 +165,7 @@ void subroutine():
 	  }
 	)*
 	{
-	  	//Remove last "," 		printString = printString.substring(0, printString.length() - 1) + ") {\n";		
+	  	//Remove last ","		printString = printString.substring(0, printString.length() - 1) + ") {\n";		
 	}	(
 	  statement = statement()
 	  {
@@ -251,7 +251,7 @@ String statement():
 	  	< IF >
 	  	bexpr = bexpr()
 	  	{
-	  	  rValue = "if ("+ bexpr + )"{\n";	  	}
+	  	  rValue = "if ("+ bexpr + "){\n";	  	}
 	  	< LBRA >
 	  	(
 	  	  statement = statement()
@@ -265,7 +265,7 @@ String statement():
 	  	< IFELSE >
 	  	bexpr = bexpr()
 		{
-		  rValue = "if ("+ bexpr + )"{\n";		}
+		  rValue = "if ("+ bexpr + "){\n";		}
 	  	< LBRA >
 	  	(
 	  	  statement = statement()
@@ -331,7 +331,7 @@ String nterm():
 }
 {
   (
-	rValue = nfactor();
+	rValue = nfactor()
     (      
       < MUL >
       nfactor = nfactor()
@@ -351,11 +351,65 @@ String nterm():
 String nfactor():
 {
 	Token t;
+	String rValue = "";
+	String nexpr;
+	String parameter;
 }
 {
-  //TODO
-	< SUB > (< NUM > | < REPCOUNT > | < PARAMETER > | < LPAR > nexpr() < RPAR >) |
-	< NUM > | < REPCOUNT > | < PARAMETER > | < LPAR > nexpr() < RPAR >
+	< SUB >
+	{
+	  rValue += " - ";	}
+	(
+	t = < NUM >
+	{
+	  rValue += t.image.toLowerCase();	}
+	|
+	< REPCOUNT >
+	{
+	  // TODO
+	  rValue += "";	}
+	|
+	t = < PARAMETER >
+	{	 	parameter = t.image.substring(1, t.image.length()).toLowerCase();
+		rValue += parameter;	
+	}
+	|
+	< LPAR >
+	nexpr =  nexpr()
+	{
+	  rValue += "(" + nexpr;	}
+	< RPAR >
+	{
+	  rValue += ")";	}
+	) |
+	t = < NUM >
+	{
+	  rValue += t.image.toLowerCase();
+	}
+	|
+	< REPCOUNT >
+	{
+	  // TODO
+	  rValue += "";
+	}
+	|
+	t = < PARAMETER >
+	{
+	 	parameter = t.image.substring(1, t.image.length()).toLowerCase();
+		rValue += parameter;	
+	}
+	|
+	< LPAR >
+	nexpr =  nexpr()
+	{
+	  rValue += "(" + nexpr;
+	}
+	< RPAR >
+	{
+	  rValue += ")";
+	}
+	{
+	  return rValue;	}
 }
 
 String bexpr():
@@ -398,10 +452,63 @@ String bterm():
 String bfactor():
 {
 	Token t;
+	String rValue = "";
+	String bexpr;
+	String nexpr;
 }
 {
-  //TODO
-	< TRUE > | < FALSE > | < NOT > < LPAR > bexpr() < RPAR >
-	| nexpr() (< EQ > | < NE > | < LT > | < GT > | < LE > | < GE > ) nexpr()
+	< TRUE >
+	{
+	  rValue += "true";	}
+	|
+	 < FALSE >
+	{
+	  rValue += "false";	}
+	|
+	 < NOT >
+	{
+	  rValue += "!";	}
+	< LPAR >
+	bexpr =  bexpr()
+	{		rValue += "(" + bexpr;
+	}
+	< RPAR >
+	{		rValue += ")\n";
+	}
+	|
+	nexpr = nexpr()
+	{
+	  rValue += nexpr;	}
+	(
+	  < EQ >
+	  {
+	    rValue += " == ";	  }
+	  |
+	  < NE >
+	  {
+	    rValue += " != ";	  }
+	  |
+	  < LT >
+	  {
+	    rValue += " < ";	  }
+	  |
+	  < GT >
+	  {		rValue += " > ";
+	  }
+	  |
+	  < LE >
+	  {
+	    rValue += " <= ";	  }
+	  |
+	  < GE >
+	  {
+	    rValue += " >= ";	  }
+	  )
+	  nexpr = nexpr()
+	  {		rValue += nexpr;
+	  }
+	  { 
+		return rValue;
+	  }
 }
 

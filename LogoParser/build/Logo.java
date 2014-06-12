@@ -5,62 +5,69 @@ import java.io.*;
 import java.util.*;
 
 public class Logo implements LogoConstants {
+  static private File javaFile, htmlFile; // output files
 
-  static private File javaFile, htmlFile;   // output files
-  static private PrintWriter pw;            // printwriter used for every output
-  static private int numIndent = 0;         // size of indentation
+  static private PrintWriter pw; // printwriter used for every output
+
+  static private int numIndent = 0; // size of indentation
 
   // to pretty-print the translation
   // uses numIndent and pw defined as static variables in LogoParser
   // writes in pw the numIndent times the indent string
-  public static void indent() {
-    for (int i=0; i<numIndent; i++) { pw.print("   "); }
+  public static void indent()
+  {
+    for (int i = 0; i < numIndent; i++)
+    {
+      pw.print("   ");
+    }
   }
 
   // Main method that reads the source file ".logo" and translates it
   // into two files: ".java" ".html"
-  public static void main(String args[]) throws ParseException,
-                                                TokenMgrError,
-                                                IOException
+  public static void main(String args []) throws ParseException, TokenMgrError, IOException
   {
     // reads the source file ".logo" (first argument of command line)
-    BufferedReader in = new BufferedReader(new FileReader(args[0]));
+    BufferedReader in = new BufferedReader(new FileReader(args [0]));
     Logo parser = new Logo(in);
-    try {
+    try
+    {
       parser.start();
       System.out.println("DONE");
     }
-    catch (ParseException x) { System.out.println("Syntaxtic Error"); throw x; }
-    catch (TokenMgrError x)  { System.out.println("Lexical Error"); throw x; }
+    catch (ParseException x)
+    {
+      System.out.println("Syntaxtic Error");
+      throw x;
+    }
+    catch (TokenMgrError x)
+    {
+      System.out.println("Lexical Error");
+      throw x;
+    }
   }
 
 //          { matchedToken.image=image.substring(1,image.length()); }
-  static final public 
-
-void start() throws ParseException, IOException {Token t;
+  static final public void start() throws ParseException, IOException {Token t;
     jj_consume_token(LOGO);
     t = jj_consume_token(IDENTIFIER);
 // Create the HTML file for the applet
-     htmlFile = new File(t.image.toLowerCase() + ".html");
-     pw = new PrintWriter(new FileOutputStream(htmlFile));
-     pw.println("<html>");
-     pw.println("  <body>");
-     pw.println("  <applet code='" + t.image.toLowerCase() +
-                ".class'width=600 height=600></applet>");
-     pw.println("  </html>");
-     pw.println("</body>");
-     pw.close();
-
-     //Create the Java file and the class
-     javaFile = new File(t.image.toLowerCase() + ".java");
-     pw = new PrintWriter(new FileOutputStream(javaFile));
-     pw.println("import java.awt.Graphics;\u005cn");
-     pw.println("public class " + t.image.toLowerCase() +
-                " extends java.applet.Applet {\u005cn" );
-     numIndent++;
-     indent();
-     pw.println("private LogoPrimitives logo;\u005cn");
-     pw.flush();
+    htmlFile = new File(t.image.toLowerCase() + ".html");
+    pw = new PrintWriter(new FileOutputStream(htmlFile));
+    pw.println("<html>");
+    pw.println("  <body>");
+    pw.println("  <applet code='" + t.image.toLowerCase() + ".class'width=600 height=600></applet>");
+    pw.println("  </html>");
+    pw.println("</body>");
+    pw.close();
+    //Create the Java file and the class
+    javaFile = new File(t.image.toLowerCase() + ".java");
+    pw = new PrintWriter(new FileOutputStream(javaFile));
+    pw.println("import java.awt.Graphics;\u005cn");
+    pw.println("public class " + t.image.toLowerCase() + " extends java.applet.Applet {\u005cn");
+    numIndent++;
+    indent();
+    pw.println("private LogoPrimitives logo;\u005cn");
+    pw.flush();
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -75,11 +82,11 @@ void start() throws ParseException, IOException {Token t;
       subroutine();
     }
 indent();
-                numIndent++;
-        pw.println("public void paint(Graphics g) {");
-                indent();
-                pw.println("logo = new LogoPrimitives(this);");
-                pw.println();
+    numIndent++;
+    pw.println("public void paint(Graphics g) {");
+    indent();
+    pw.println("logo = new LogoPrimitives(this);");
+    pw.println();
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -107,19 +114,20 @@ indent();
       statement();
     }
 numIndent--;
-                indent();
-                pw.println("}");
+    indent();
+    pw.println("}");
     jj_consume_token(END);
 numIndent--;
-        indent();
-        pw.println("}");
-    pw.flush(); pw.close();
+    indent();
+    pw.println("}");
+    pw.flush();
+    pw.close();
   }
 
   static final public void subroutine() throws ParseException {Token t;
-        String printString = "";
-        String parameter = "";
-        String statement = "";
+  String printString = "";
+  String parameter = "";
+  String statement = "";
     jj_consume_token(SUBROUTINE);
     t = jj_consume_token(IDENTIFIER);
 printString = "private void " + t.image.toLowerCase() + "(";
@@ -136,10 +144,10 @@ printString = "private void " + t.image.toLowerCase() + "(";
       }
       jj_consume_token(PARAMETER);
 parameter = t.image.substring(1, t.image.length()).toLowerCase();
-                printString += "double " + parameter + ",";
+        printString += "double " + parameter + ",";
     }
 //Remove last ","
-                printString = printString.substring(0, printString.length() - 1) + ") {\u005cn";
+      printString += printString.substring(0, printString.length() - 1) + ") {\u005cn";
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -164,80 +172,79 @@ parameter = t.image.substring(1, t.image.length()).toLowerCase();
         jj_la1[3] = jj_gen;
         break label_4;
       }
-      statement = statement();
-printString += statement;
+      statement();
     }
-printString += "} \u005cn";
+printString += "}\u005cn";
     jj_consume_token(END);
 pw.println(printString);
-          pw.flush();
+      pw.flush();
   }
 
-  static final public String statement() throws ParseException {Token t;
-        String rValue = "";
-        String nexpr;
-        String bexpr;
-        String statement;
+  static final public void statement() throws ParseException {Token t;
+  String rValue = "";
+  String nexpr;
+  String bexpr;
+  String statement;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CLEARSCREEN:{
       jj_consume_token(CLEARSCREEN);
-rValue = "logo.cs();\u005cn";
+pw.println("logo.cs();\u005cn");
       break;
       }
     case PENDOWN:{
       jj_consume_token(PENDOWN);
-rValue = "logo.pd();\u005cn";
+pw.println("logo.pd();\u005cn");
       break;
       }
     case PENUP:{
       jj_consume_token(PENUP);
-rValue = "logo.pu();\u005cn";
+pw.println("logo.pu();\u005cn");
       break;
       }
     case HIDETURTLE:{
       jj_consume_token(HIDETURTLE);
-rValue = "logo.ht();\u005cn";
+pw.println("logo.ht();\u005cn");
       break;
       }
     case SHOWTURTLE:{
       jj_consume_token(SHOWTURTLE);
-rValue = "logo.st();\u005cn";
+pw.println("logo.st();\u005cn");
       break;
       }
     case FORWARD:{
       jj_consume_token(FORWARD);
       nexpr = nexpr();
-rValue = "logo.fd(" + nexpr + ");\u005cn";
+pw.println("logo.fd(" + nexpr + ");\u005cn");
       break;
       }
     case BACKWARD:{
       jj_consume_token(BACKWARD);
       nexpr = nexpr();
-rValue = "logo.bk(" + nexpr + ");\u005cn";
+pw.println("logo.bk(" + nexpr + ");\u005cn");
       break;
       }
     case LEFTTURN:{
       jj_consume_token(LEFTTURN);
       nexpr = nexpr();
-rValue = "logo.lt(" + nexpr + ");\u005cn";
+pw.println("logo.lt(" + nexpr + ");\u005cn");
       break;
       }
     case RIGHTTURN:{
       jj_consume_token(RIGHTTURN);
       nexpr = nexpr();
-rValue = "logo.rt(" + nexpr + ");\u005cn";
+pw.println("logo.rt(" + nexpr + ");\u005cn");
       break;
       }
     case WAIT:{
       jj_consume_token(WAIT);
       nexpr = nexpr();
-rValue = "logo.wait(" + nexpr + ");\u005cn";
+pw.println("logo.wait(" + nexpr + ");\u005cn");
       break;
       }
     case REPEAT:{
       jj_consume_token(REPEAT);
       nexpr = nexpr();
-rValue = "for(int i = 1; i <= " + nexpr + "; i++){\u005cn";
+pw.println("for(int i = 1; i <= " + nexpr + "; i++){\u005cn");
       jj_consume_token(LBRA);
       label_5:
       while (true) {
@@ -263,17 +270,16 @@ rValue = "for(int i = 1; i <= " + nexpr + "; i++){\u005cn";
           jj_la1[4] = jj_gen;
           break label_5;
         }
-        statement = statement();
-rValue += statement;
+        statement();
       }
       jj_consume_token(RBRA);
-rValue = rValue + "}\u005cn";
+pw.println(rValue + "}\u005cn");
       break;
       }
     case IF:{
       jj_consume_token(IF);
       bexpr = bexpr();
-rValue = "if ("+ bexpr + "){\u005cn";
+pw.println("if (" + bexpr + "){\u005cn");
       jj_consume_token(LBRA);
       label_6:
       while (true) {
@@ -299,17 +305,16 @@ rValue = "if ("+ bexpr + "){\u005cn";
           jj_la1[5] = jj_gen;
           break label_6;
         }
-        statement = statement();
-rValue += statement;
+        statement();
       }
       jj_consume_token(RBRA);
-rValue += "}\u005cn";
+pw.println("}\u005cn");
       break;
       }
     case IFELSE:{
       jj_consume_token(IFELSE);
       bexpr = bexpr();
-rValue = "if ("+ bexpr + "){\u005cn";
+pw.println("if (" + bexpr + "){\u005cn");
       jj_consume_token(LBRA);
       label_7:
       while (true) {
@@ -335,11 +340,10 @@ rValue = "if ("+ bexpr + "){\u005cn";
           jj_la1[6] = jj_gen;
           break label_7;
         }
-        statement = statement();
-rValue += statement;
+        statement();
       }
       jj_consume_token(RBRA);
-rValue += "} else {\u005cn";
+pw.println("} else {\u005cn");
       jj_consume_token(LBRA);
       label_8:
       while (true) {
@@ -365,16 +369,15 @@ rValue += "} else {\u005cn";
           jj_la1[7] = jj_gen;
           break label_8;
         }
-        statement = statement();
-rValue += statement;
+        statement();
       }
       jj_consume_token(RBRA);
-rValue += "}\u005cn";
+pw.println("}\u005cn");
       break;
       }
     case IDENTIFIER:{
       t = jj_consume_token(IDENTIFIER);
-rValue = t.image.toLowerCase() + "(";
+pw.println(t.image.toLowerCase() + "(");
       label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -394,7 +397,7 @@ rValue = t.image.toLowerCase() + "(";
 rValue += nexpr + ",";
       }
 //Remove last "," 
-            rValue = rValue.substring(0, rValue.length() - 1) + ");\u005cn";
+      pw.println(rValue.substring(0, rValue.length() - 1) + ");\u005cn");
       break;
       }
     default:
@@ -402,13 +405,11 @@ rValue += nexpr + ",";
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return rValue;}
-    throw new Error("Missing return statement in function");
   }
 
   static final public String nexpr() throws ParseException {Token t;
-        String rValue = "";
-        String nterm;
+  String rValue = "";
+  String nterm;
     rValue = nterm();
     label_10:
     while (true) {
@@ -445,9 +446,8 @@ rValue += " - " + nterm;
     throw new Error("Missing return statement in function");
   }
 
-  static final public String nterm() throws ParseException {Token t;
-        String rValue = "";
-        String nfactor;
+  static final public String nterm() throws ParseException {String rValue = "";
+  String nfactor;
     rValue = nfactor();
     label_11:
     while (true) {
@@ -485,9 +485,9 @@ rValue += " / " + nfactor;
   }
 
   static final public String nfactor() throws ParseException {Token t;
-        String rValue = "";
-        String nexpr;
-        String parameter;
+  String rValue = "";
+  String nexpr;
+  String parameter;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case SUB:{
       jj_consume_token(SUB);
@@ -501,13 +501,13 @@ rValue += t.image.toLowerCase();
       case REPCOUNT:{
         jj_consume_token(REPCOUNT);
 // TODO
-          rValue += "";
+      rValue += "";
         break;
         }
       case PARAMETER:{
         t = jj_consume_token(PARAMETER);
 parameter = t.image.substring(1, t.image.length()).toLowerCase();
-                rValue += parameter;
+      rValue += parameter;
         break;
         }
       case LPAR:{
@@ -533,13 +533,13 @@ rValue += t.image.toLowerCase();
     case REPCOUNT:{
       jj_consume_token(REPCOUNT);
 // TODO
-          rValue += "";
+    rValue += "";
       break;
       }
     case PARAMETER:{
       t = jj_consume_token(PARAMETER);
 parameter = t.image.substring(1, t.image.length()).toLowerCase();
-                rValue += parameter;
+    rValue += parameter;
       break;
       }
     case LPAR:{
@@ -548,7 +548,6 @@ parameter = t.image.substring(1, t.image.length()).toLowerCase();
 rValue += "(" + nexpr;
       jj_consume_token(RPAR);
 rValue += ")";
-{if ("" != null) return rValue;}
       break;
       }
     default:
@@ -556,12 +555,13 @@ rValue += ")";
       jj_consume_token(-1);
       throw new ParseException();
     }
+{if ("" != null) return rValue;}
     throw new Error("Missing return statement in function");
   }
 
   static final public String bexpr() throws ParseException {Token t;
-        String rValue = "";
-        String bterm;
+  String rValue = "";
+  String bterm;
     rValue = bterm();
     label_12:
     while (true) {
@@ -583,8 +583,8 @@ rValue += " || " + bterm;
   }
 
   static final public String bterm() throws ParseException {Token t;
-        String rValue = "";
-        String bfactor;
+  String rValue = "";
+  String bfactor;
     rValue = bfactor();
     label_13:
     while (true) {
@@ -606,9 +606,9 @@ rValue += " && " + bfactor;
   }
 
   static final public String bfactor() throws ParseException {Token t;
-        String rValue = "";
-        String bexpr;
-        String nexpr;
+  String rValue = "";
+  String bexpr;
+  String nexpr;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case TRUE:{
       jj_consume_token(TRUE);
@@ -627,7 +627,7 @@ rValue += "!";
       bexpr = bexpr();
 rValue += "(" + bexpr;
       jj_consume_token(RPAR);
-rValue += ")\u005cn";
+rValue += ")";
       break;
       }
     case SUB:

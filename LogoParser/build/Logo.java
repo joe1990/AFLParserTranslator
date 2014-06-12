@@ -130,7 +130,7 @@ numIndent--;
   String statement = "";
     jj_consume_token(SUBROUTINE);
     t = jj_consume_token(IDENTIFIER);
-printString = "private void " + t.image.toLowerCase() + "(";
+pw.print("private void " + t.image.toLowerCase() + "(");
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -142,12 +142,12 @@ printString = "private void " + t.image.toLowerCase() + "(";
         jj_la1[2] = jj_gen;
         break label_3;
       }
-      jj_consume_token(PARAMETER);
+      t = jj_consume_token(PARAMETER);
 parameter = t.image.substring(1, t.image.length()).toLowerCase();
         printString += "double " + parameter + ",";
     }
 //Remove last ","
-      printString += printString.substring(0, printString.length() - 1) + ") {\u005cn";
+      pw.println(printString.substring(0, printString.length() - 1) + ") {\u005cn");
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -174,10 +174,9 @@ parameter = t.image.substring(1, t.image.length()).toLowerCase();
       }
       statement();
     }
-printString += "}\u005cn";
+pw.println("}\u005cn");
     jj_consume_token(END);
-pw.println(printString);
-      pw.flush();
+pw.flush();
   }
 
   static final public void statement() throws ParseException {Token t;
@@ -405,6 +404,7 @@ rValue += nexpr + ",";
       jj_consume_token(-1);
       throw new ParseException();
     }
+pw.flush();
   }
 
   static final public String nexpr() throws ParseException {Token t;

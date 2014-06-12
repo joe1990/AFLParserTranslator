@@ -127,7 +127,6 @@ numIndent--;
   static final public void subroutine() throws ParseException {Token t;
   String printString = "";
   String parameter = "";
-  String statement = "";
     jj_consume_token(SUBROUTINE);
     t = jj_consume_token(IDENTIFIER);
 pw.print("private void " + t.image.toLowerCase() + "(");
@@ -183,7 +182,6 @@ pw.flush();
   String rValue = "";
   String nexpr;
   String bexpr;
-  String statement;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CLEARSCREEN:{
       jj_consume_token(CLEARSCREEN);
@@ -243,7 +241,7 @@ pw.println("logo.wait(" + nexpr + ");\u005cn");
     case REPEAT:{
       jj_consume_token(REPEAT);
       nexpr = nexpr();
-pw.println("for(int i = 1; i <= " + nexpr + "; i++){\u005cn");
+pw.println("for(int i = 0; i < " + nexpr + "; i++){\u005cn");
       jj_consume_token(LBRA);
       label_5:
       while (true) {
@@ -407,8 +405,7 @@ rValue += nexpr + ",";
 pw.flush();
   }
 
-  static final public String nexpr() throws ParseException {Token t;
-  String rValue = "";
+  static final public String nexpr() throws ParseException {String rValue = "";
   String nterm;
     rValue = nterm();
     label_10:
@@ -501,7 +498,7 @@ rValue += t.image.toLowerCase();
       case REPCOUNT:{
         jj_consume_token(REPCOUNT);
 // TODO
-      rValue += "";
+      rValue += "i";
         break;
         }
       case PARAMETER:{
@@ -533,7 +530,7 @@ rValue += t.image.toLowerCase();
     case REPCOUNT:{
       jj_consume_token(REPCOUNT);
 // TODO
-    rValue += "";
+    rValue += "i";
       break;
       }
     case PARAMETER:{
@@ -559,8 +556,7 @@ rValue += ")";
     throw new Error("Missing return statement in function");
   }
 
-  static final public String bexpr() throws ParseException {Token t;
-  String rValue = "";
+  static final public String bexpr() throws ParseException {String rValue = "";
   String bterm;
     rValue = bterm();
     label_12:
@@ -582,8 +578,7 @@ rValue += " || " + bterm;
     throw new Error("Missing return statement in function");
   }
 
-  static final public String bterm() throws ParseException {Token t;
-  String rValue = "";
+  static final public String bterm() throws ParseException {String rValue = "";
   String bfactor;
     rValue = bfactor();
     label_13:
@@ -605,8 +600,7 @@ rValue += " && " + bfactor;
     throw new Error("Missing return statement in function");
   }
 
-  static final public String bfactor() throws ParseException {Token t;
-  String rValue = "";
+  static final public String bfactor() throws ParseException {String rValue = "";
   String bexpr;
   String nexpr;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {

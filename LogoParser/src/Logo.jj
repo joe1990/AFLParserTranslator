@@ -6,7 +6,7 @@ options{  FORCE_LA_CHECK = true;  //DEBUG_PARSER = true;
   //DEBUG_TOKEN_MANAGER = true;
 }PARSER_BEGIN(Logo)import java.lang.*;import java.io.*;import java.util.*;public class Logo{  static private File javaFile, htmlFile; // output files
   static private PrintWriter pw; // printwriter used for every output  static private int numIndent = 0; // size of indentation
-  static private int forIndex = 104; //104 = ASCII Code for h. h++ = i -- > needed for the for-loops (nested for-loops)
+  static private char forIndex = 104; //104 = ASCII Code for h. h++ = i -- > needed for the for-loops (nested for-loops)
     // to pretty-print the translation
   // uses numIndent and pw defined as static variables in LogoParser
   // writes in pw the numIndent times the indent string
@@ -35,8 +35,7 @@ void start() throws IOException :{  Token t;}{  // logo programs start with
 	  forIndex++;	}
   	nexpr = nexpr()    {
       numIndent++;
-      char variableName = (char)(forIndex);
-      pw.println("for(int " + variableName +" = 0; "+ variableName +" < " + nexpr + "; "+ variableName + "++){\n");
+      pw.println("for(int " + forIndex +" = 0; "+ forIndex +" < " + nexpr + "; "+ forIndex + "++){\n");
     }    < LBRA >    (      statement()    )*    < RBRA >    {
       numIndent--;      pw.println(rValue + "}\n");    }
     {
@@ -66,5 +65,5 @@ void start() throws IOException :{  Token t;}{  // logo programs start with
     return rValue;
   }
 } String nfactor() :{  Token t;  String rValue = "";  String nexpr;  String parameter;}{  (    < SUB >  {    rValue += " - ";  }  (    t = < NUM >    {      rValue += t.image.toLowerCase();    }  | < REPCOUNT >    {      // TODO
-      rValue += "i";    }  | t = < PARAMETER >    {      parameter = t.image.substring(1, t.image.length()).toLowerCase();      rValue += parameter;    }  | < LPAR > nexpr = nexpr()    {      rValue += "(" + nexpr;    }    < RPAR >    {      rValue += ")";    }  )| t = < NUM >  {    rValue += t.image.toLowerCase();  }| < REPCOUNT >  {    // TODO
-    rValue += "i";  }| t = < PARAMETER >  {    parameter = t.image.substring(1, t.image.length()).toLowerCase();    rValue += parameter;  }| < LPAR > nexpr = nexpr()  {    rValue += "(" + nexpr;  }  < RPAR >  {    rValue += ")";  })  {    return rValue;  }}String bexpr() :{  String rValue = "";  String bterm;}{  (    rValue = bterm()    (      < OR > bterm = bterm()      {        rValue += " || " + bterm;      }    )*  )  {    return rValue;  }}String bterm() :{  String rValue = "";  String bfactor;}{  (    rValue = bfactor()    (      < AND > bfactor = bfactor()      {        rValue += " && " + bfactor;      }    )*  )  {    return rValue;  }}String bfactor() :{  String rValue = "";  String bexpr;  String nexpr;}{  < TRUE >  {    rValue += "true";  }| < FALSE >  {    rValue += "false";  }| < NOT >  {    rValue += "!";  }  < LPAR > bexpr = bexpr()  {    rValue += "(" + bexpr;  }  < RPAR >  {    rValue += ")";  }| nexpr = nexpr()  {    rValue += nexpr;  }  (    < EQ >    {      rValue += " == ";    }  | < NE >    {      rValue += " != ";    }  | < LT >    {      rValue += " < ";    }  | < GT >    {      rValue += " > ";    }  | < LE >    {      rValue += " <= ";    }  | < GE >    {      rValue += " >= ";    }  )  nexpr = nexpr()  {    rValue += nexpr;  }  {    return rValue;  }}
+      rValue += forIndex;    }  | t = < PARAMETER >    {      parameter = t.image.substring(1, t.image.length()).toLowerCase();      rValue += parameter;    }  | < LPAR > nexpr = nexpr()    {      rValue += "(" + nexpr;    }    < RPAR >    {      rValue += ")";    }  )| t = < NUM >  {    rValue += t.image.toLowerCase();  }| < REPCOUNT >  {    // TODO
+    rValue += forIndex;  }| t = < PARAMETER >  {    parameter = t.image.substring(1, t.image.length()).toLowerCase();    rValue += parameter;  }| < LPAR > nexpr = nexpr()  {    rValue += "(" + nexpr;  }  < RPAR >  {    rValue += ")";  })  {    return rValue;  }}String bexpr() :{  String rValue = "";  String bterm;}{  (    rValue = bterm()    (      < OR > bterm = bterm()      {        rValue += " || " + bterm;      }    )*  )  {    return rValue;  }}String bterm() :{  String rValue = "";  String bfactor;}{  (    rValue = bfactor()    (      < AND > bfactor = bfactor()      {        rValue += " && " + bfactor;      }    )*  )  {    return rValue;  }}String bfactor() :{  String rValue = "";  String bexpr;  String nexpr;}{  < TRUE >  {    rValue += "true";  }| < FALSE >  {    rValue += "false";  }| < NOT >  {    rValue += "!";  }  < LPAR > bexpr = bexpr()  {    rValue += "(" + bexpr;  }  < RPAR >  {    rValue += ")";  }| nexpr = nexpr()  {    rValue += nexpr;  }  (    < EQ >    {      rValue += " == ";    }  | < NE >    {      rValue += " != ";    }  | < LT >    {      rValue += " < ";    }  | < GT >    {      rValue += " > ";    }  | < LE >    {      rValue += " <= ";    }  | < GE >    {      rValue += " >= ";    }  )  nexpr = nexpr()  {    rValue += nexpr;  }  {    return rValue;  }}

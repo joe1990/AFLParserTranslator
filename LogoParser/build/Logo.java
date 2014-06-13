@@ -8,7 +8,7 @@ public class Logo implements LogoConstants {
   static private File javaFile, htmlFile; // output files
 
   static private PrintWriter pw; // printwriter used for every output  static private int numIndent = 0; // size of indentation
-  static private int forIndex = 104; //104 = ASCII Code for h. h++ = i -- > needed for the for-loops (nested for-loops)
+  static private char forIndex = 104; //104 = ASCII Code for h. h++ = i -- > needed for the for-loops (nested for-loops)
 
   // to pretty-print the translation
   // uses numIndent and pw defined as static variables in LogoParser
@@ -243,8 +243,7 @@ pw.println("logo.wait(" + nexpr + ");\u005cn");
           forIndex++;
       nexpr = nexpr();
 numIndent++;
-      char variableName = (char)(forIndex);
-      pw.println("for(int " + variableName +" = 0; "+ variableName +" < " + nexpr + "; "+ variableName + "++){\u005cn");
+      pw.println("for(int " + forIndex +" = 0; "+ forIndex +" < " + nexpr + "; "+ forIndex + "++){\u005cn");
       jj_consume_token(LBRA);
       label_5:
       while (true) {
@@ -503,7 +502,7 @@ rValue += t.image.toLowerCase();
       case REPCOUNT:{
         jj_consume_token(REPCOUNT);
 // TODO
-      rValue += "i";
+      rValue += forIndex;
         break;
         }
       case PARAMETER:{
@@ -535,7 +534,7 @@ rValue += t.image.toLowerCase();
     case REPCOUNT:{
       jj_consume_token(REPCOUNT);
 // TODO
-    rValue += "i";
+    rValue += forIndex;
       break;
       }
     case PARAMETER:{

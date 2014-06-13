@@ -243,7 +243,7 @@ pw.println("logo.wait(" + nexpr + ");\u005cn");
           forIndex++;
       nexpr = nexpr();
 numIndent++;
-      pw.println("for(int " + forIndex +" = 0; "+ forIndex +" < " + nexpr + "; "+ forIndex + "++){\u005cn");
+      pw.println("for(int " + forIndex +" = 1; "+ forIndex +" <= " + nexpr + "; "+ forIndex + "++){\u005cn");
       jj_consume_token(LBRA);
       label_5:
       while (true) {
@@ -503,6 +503,8 @@ rValue += t.image.toLowerCase();
         jj_consume_token(REPCOUNT);
 // TODO
       rValue += forIndex;
+      //rValue += "i";
+
         break;
         }
       case PARAMETER:{
@@ -535,6 +537,8 @@ rValue += t.image.toLowerCase();
       jj_consume_token(REPCOUNT);
 // TODO
     rValue += forIndex;
+    //rValue += "i";
+
       break;
       }
     case PARAMETER:{

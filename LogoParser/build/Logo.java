@@ -7,9 +7,8 @@ import java.util.*;
 public class Logo implements LogoConstants {
   static private File javaFile, htmlFile; // output files
 
-  static private PrintWriter pw; // printwriter used for every output
-
-  static private int numIndent = 0; // size of indentation
+  static private PrintWriter pw; // printwriter used for every output  static private int numIndent = 0; // size of indentation
+  static private int forIndex = 104; //104 = ASCII Code for h. h++ = i -- > needed for the for-loops (nested for-loops)
 
   // to pretty-print the translation
   // uses numIndent and pw defined as static variables in LogoParser
@@ -240,8 +239,12 @@ pw.println("logo.wait(" + nexpr + ");\u005cn");
       }
     case REPEAT:{
       jj_consume_token(REPEAT);
+//Count index for the for-variable (nested loops).
+          forIndex++;
       nexpr = nexpr();
-pw.println("for(int i = 0; i < " + nexpr + "; i++){\u005cn");
+numIndent++;
+      char variableName = (char)(forIndex);
+      pw.println("for(int " + variableName +" = 0; "+ variableName +" < " + nexpr + "; "+ variableName + "++){\u005cn");
       jj_consume_token(LBRA);
       label_5:
       while (true) {
@@ -270,7 +273,9 @@ pw.println("for(int i = 0; i < " + nexpr + "; i++){\u005cn");
         statement();
       }
       jj_consume_token(RBRA);
-pw.println(rValue + "}\u005cn");
+numIndent--;
+      pw.println(rValue + "}\u005cn");
+forIndex--;
       break;
       }
     case IF:{
